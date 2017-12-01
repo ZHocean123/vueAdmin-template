@@ -28,10 +28,12 @@ export const constantRouterMap = [
     redirect: '/dashboard',
     name: 'Dashboard',
     hidden: true,
-    children: [{
-      path: 'dashboard',
-      component: _import('dashboard/index')
-    }]
+    children: [
+      {
+        path: 'dashboard',
+        component: _import('dashboard/index')
+      }
+    ]
   },
 
   {
@@ -69,6 +71,31 @@ export const constantRouterMap = [
     ]
   },
 
+  {
+    path: '/work-time',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'work-time',
+        component: _import('work-time'),
+        meta: { title: '工时统计', icon: 'users' }
+      }
+    ]
+  },
+  {
+    path: '/basic-data',
+    component: Layout,
+    children: [
+      {
+        path: 'worker',
+        name: 'worker',
+        component: _import('worker'),
+        meta: { title: '员工管理', icon: 'users' }
+      }
+    ]
+  },
+
   { path: '*', redirect: '/404', hidden: true }
 ]
 
@@ -77,4 +104,3 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
-

@@ -1,10 +1,17 @@
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import {
+  getToken,
+  setToken,
+  removeToken,
+  getLoginName,
+  setLoginName,
+  removeLoginName
+} from '@/utils/auth'
 
 const user = {
   state: {
     token: getToken(),
-    name: '',
+    name: getLoginName(),
     avatar: '',
     roles: []
   },
@@ -27,45 +34,54 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
+      const loginName = userInfo.loginName.trim()
       return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
-          const data = response.data
-          setToken(data.token)
-          commit('SET_TOKEN', data.token)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
+        login(loginName, userInfo.password)
+          .then(response => {
+            const data = response
+            setToken(data.user.id)
+            setLoginName(loginName)
+            commit('SET_TOKEN', data.user.id)
+            commit('SET_NAME', loginName)
+            resolve()
+          })
+          .catch(error => {
+            reject(error)
+          })
       })
     },
 
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
-          const data = response.data
-          commit('SET_ROLES', data.role)
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          resolve(response)
-        }).catch(error => {
-          reject(error)
-        })
+        getInfo(state.token)
+          .then(response => {
+            const data = response.data
+            commit('SET_ROLES', data.role)
+            commit('SET_NAME', data.name)
+            commit('SET_AVATAR', data.avatar)
+            resolve(response)
+          })
+          .catch(error => {
+            reject(error)
+          })
       })
     },
 
     // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
-          removeToken()
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
+        logout(state.token)
+          .then(() => {
+            commit('SET_TOKEN', '')
+            commit('SET_ROLES', [])
+            removeToken()
+            removeLoginName()
+            resolve()
+          })
+          .catch(error => {
+            reject(error)
+          })
       })
     },
 
@@ -74,6 +90,7 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
         removeToken()
+        removeLoginName()
         resolve()
       })
     }
